@@ -1,9 +1,14 @@
 #include "Entity.h"
 
-Entity::Entity()
-{
-}
+#include "Maze.h"
 
 Entity::~Entity()
 {
+}
+
+bool Entity::init(Maze * maze)
+{
+	this->maze = maze;
+	maze->addChild(this);
+	return true;
 }

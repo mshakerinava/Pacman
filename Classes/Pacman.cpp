@@ -1,10 +1,10 @@
 #include "Pacman.h"
 
-#include "cocos2d.h"
+#include "Maze.h"
 
 USING_NS_CC;
 
-Pacman* Pacman::create(Maze *maze)
+Pacman * Pacman::create(Maze *maze)
 {
 	Pacman *pacman = new (std::nothrow) Pacman();
 	if (pacman && pacman->init(maze))
@@ -18,7 +18,7 @@ Pacman* Pacman::create(Maze *maze)
 
 bool Pacman::init(Maze *maze)
 {
-	this->maze = maze;
+	Entity::init(maze);
 	this->speed = 0.8f;
 	this->eatingAnimation();
 	this->intensionDirection = Direction::LEFT;
@@ -29,6 +29,7 @@ bool Pacman::init(Maze *maze)
 
 float Pacman::moveTowards(Vec2 dest, float delta)
 {
+	/* Several dispositions occur! Fix maybe? */
 	float dpx = MAX_SPEED * speed * delta;
 
 	float curx = this->getPositionX();
@@ -38,6 +39,11 @@ float Pacman::moveTowards(Vec2 dest, float delta)
 	this->setPositionY(abs(dest.y - cury) <= dpx ? dest.y : cury + dpx * (dest.y - cury) / abs(dest.y - cury));
 
 	return MAX(0, delta * (1 - MAX(abs(dest.x - curx), abs(dest.y - cury)) / dpx));
+}
+
+void Pacman::die()
+{
+	this->deathAnimation();
 }
 
 void Pacman::energize()
@@ -132,7 +138,7 @@ void Pacman::update(float delta)
 	else if (nextTile && nextTile->isLegalSpace())
 	{
 		this->resume();
-		delta = this->moveTowards(curTile->getPosition() + movingDirection.getvec2() * (4.0f + 1E-4), delta);
+		delta = this->moveTowards(curTile->getPosition() + movingDirection.getvec2() * (4.0f + 1E-4f), delta);
 		if (delta > 0)
 			this->update(delta);
 	}

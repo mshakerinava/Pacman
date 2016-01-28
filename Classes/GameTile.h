@@ -25,6 +25,8 @@ public:
 private:
 	bool init(Maze *maze, int row, int col, char token);
 
+	void flashingAnimation();
+
 	Maze *maze;
 	char token;
 	int row, col;

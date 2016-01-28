@@ -1,17 +1,31 @@
 #include "Maze.h"
 
+#include "PacmanGame.h"
+
 #include <iostream>
 
-Maze* Maze::create(std::string mazeName)
+#include "EventManager.h"
+
+Maze * Maze::create(std::string mazeName, PacmanGame *game)
 {
 	Maze *maze = new (std::nothrow) Maze();
-	if (maze && maze->init(mazeName))
+	if (maze && maze->init(mazeName, game))
 	{
 		maze->autorelease();
 		return maze;
 	}
 	CC_SAFE_DELETE(maze);
 	return nullptr;
+}
+
+int Maze::getWidth()
+{
+	return width;
+}
+
+int Maze::getHeight()
+{
+	return height;
 }
 
 GameTile * Maze::getTile(Vec2 pos)
@@ -40,13 +54,50 @@ GameTile * Maze::getTile(int row, int col)
 	return nullptr;
 }
 
+GameTile * Maze::getPacmanTile()
+{
+	return this->getTile(pacman->getPosition());
+}
+
 Vec2 Maze::getPacmanStartPos()
 {
 	return pacmanStartPos;
 }
 
-bool Maze::init(std::string mazeName)
+Vec2 Maze::getBlinkyStartPos()
 {
+	return blinkyStartPos;
+}
+
+Vec2 Maze::getPinkyStartPos()
+{
+	return pinkyStartPos;
+}
+
+Vec2 Maze::getInkyStartPos()
+{
+	return inkyStartPos;
+}
+
+Vec2 Maze::getClydeStartPos()
+{
+	return clydeStartPos;
+}
+
+Vec2 Maze::getTextMidPos()
+{
+	return textMidPos;
+}
+
+void Maze::killPacman()
+{
+}
+
+bool Maze::init(std::string mazeName, PacmanGame *game)
+{
+	this->game = game;
+	game->addChild(this);
+
 	std::string tilemap = FileUtils::getInstance()->getStringFromFile("mazes/" + mazeName + "/tilemap.txt");
 	std::stringstream ss(tilemap);
 	ss >> this->width >> this->height;
@@ -64,6 +115,7 @@ bool Maze::init(std::string mazeName)
 			this->addChild(tiles[i][j]);
 		}
 	}
+	
 	for (int i = 0; i < 5; ++i)
 	{
 		std::string label;
@@ -84,6 +136,20 @@ bool Maze::init(std::string mazeName)
 		else if (label == "text")
 			this->textMidPos = Vec2(x, y);
 	}
+
+	game->
+	this->setPosition(winSize.width / 2.0, winSize.height / 2.0);
+	
+	this->runAction(ScaleBy::create(0, 2));
+
+	auto pacman = Pacman::create(this);
+	auto blinky = Blinky::create(this);
+	auto pinky  = Pinky::create(this);
+	auto inky   = Inky::create(this);
+	auto clyde  = Clyde::create(this);
+
+	EventManager::getInstance()->addEventListeners(this, pacman);
+
 	return Sprite::initWithFile("mazes/" + mazeName + "/sprite.png");
 }
 

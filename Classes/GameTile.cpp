@@ -33,12 +33,28 @@ bool GameTile::init(Maze *maze, int row, int col, char token)
 	case '.':
 		return Sprite::initWithFile("images/spritesheet.png", Rect(2, 191, 8, 8));
 	case '@':
+		this->flashingAnimation();
 		return Sprite::initWithFile("images/spritesheet.png", Rect(2, 182, 8, 8));
 	default:
 		/* Completely transparent */
 		return Sprite::initWithFile("images/spritesheet.png", Rect(314, 272, 8, 8));
 		/* TODO : Better idea? */
 	}
+}
+
+void GameTile::flashingAnimation()
+{
+	/* Create SpriteFrames */
+	Vector<SpriteFrame*> animFrames;
+	animFrames.reserve(2);
+	animFrames.pushBack(SpriteFrame::create("images/spritesheet.png", Rect(2, 182, 8, 8)));
+	animFrames.pushBack(SpriteFrame::create("images/spritesheet.png", Rect(314, 272, 8, 8)));
+	/* Create Animation */
+	Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.2f);
+	/* Create Action */
+	Animate* animate = Animate::create(animation);
+	/* Run and repeat Action forever */
+	this->runAction(RepeatForever::create(animate));
 }
 
 char GameTile::getToken()
@@ -75,9 +91,9 @@ bool GameTile::isLegalSpace()
 
 bool GameTile::isIntersection()
 {
-	int ways = 0;
 	if (intersection == -1)
 	{
+		int ways = 0;
 		for (int d = -1; d <= 1; d += 2)
 		{
 			if (maze->getTile(row + d, col) && maze->getTile(row + d, col)->isLegalSpace())
@@ -87,7 +103,7 @@ bool GameTile::isIntersection()
 		}
 		intersection = ways > 2 ? 1 : 0;
 	}
-	return intersection;
+	return (bool)intersection;
 }
 
 void GameTile::eat()
@@ -95,4 +111,5 @@ void GameTile::eat()
 	if (this->token == '.' || this->token == '@')
 		this->token = '-';
 	this->setOpacity(0);
+	this->stopAllActions();
 }
