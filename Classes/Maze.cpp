@@ -59,6 +59,11 @@ GameTile * Maze::getPacmanTile()
 	return this->getTile(pacman->getPosition());
 }
 
+int Maze::getLevel()
+{
+	return game->getLevel();
+}
+
 Vec2 Maze::getPacmanStartPos()
 {
 	return pacmanStartPos;
@@ -89,8 +94,83 @@ Vec2 Maze::getTextMidPos()
 	return textMidPos;
 }
 
+Vec2 Maze::getLifeLeftPos()
+{
+	return lifeLeftPos;
+}
+
 void Maze::killPacman()
 {
+	pacman->die();
+	game->pacmanDied();
+}
+
+void Maze::deathAnimation()
+{
+	pacman->deathAnimation();
+}
+
+void Maze::control(Direction dir)
+{
+	pacman->control(dir);
+}
+
+void Maze::stopEntities()
+{
+	blinky->stopMoving();
+	pinky->stopMoving();
+	inky->stopMoving();
+	clyde->stopMoving();
+	pacman->stopMoving();
+}
+
+void Maze::resetEntities()
+{
+	if (blinky)
+		this->removeChild(blinky, true);
+	blinky = Blinky::create(this);
+	
+	if (pinky)
+		this->removeChild(pinky, true);
+	pinky = Pinky::create(this);
+	
+	if (inky)
+		this->removeChild(inky, true);
+	inky = Inky::create(this);
+	
+	if (clyde)
+		this->removeChild(clyde, true);
+	clyde = Clyde::create(this);
+	
+	if (pacman)
+		this->removeChild(pacman, true);
+	pacman = Pacman::create(this);
+}
+
+void Maze::hideGhosts()
+{
+	blinky->setOpacity(0);
+	pinky->setOpacity(0);
+	inky->setOpacity(0);
+	clyde->setOpacity(0);
+}
+
+void Maze::frightenGhosts()
+{
+	blinky->fright();
+	pinky->fright();
+	inky->fright();
+	clyde->fright();
+}
+
+void Maze::hidePacman()
+{
+	this->pacman->setOpacity(0);
+}
+
+void Maze::addScore(int score)
+{
+	game->addScore(score);
 }
 
 bool Maze::init(std::string mazeName, PacmanGame *game)
@@ -116,7 +196,7 @@ bool Maze::init(std::string mazeName, PacmanGame *game)
 		}
 	}
 	
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 7; ++i)
 	{
 		std::string label;
 		ss >> label;
@@ -135,20 +215,12 @@ bool Maze::init(std::string mazeName, PacmanGame *game)
 			this->clydeStartPos = Vec2(x, y);
 		else if (label == "text")
 			this->textMidPos = Vec2(x, y);
+		else if (label == "life")
+			this->lifeLeftPos = Vec2(x, y);
 	}
-
-	game->
-	this->setPosition(winSize.width / 2.0, winSize.height / 2.0);
 	
-	this->runAction(ScaleBy::create(0, 2));
-
-	auto pacman = Pacman::create(this);
-	auto blinky = Blinky::create(this);
-	auto pinky  = Pinky::create(this);
-	auto inky   = Inky::create(this);
-	auto clyde  = Clyde::create(this);
-
-	EventManager::getInstance()->addEventListeners(this, pacman);
+	this->setPosition(width * 4, height * 4);
+	this->resetEntities();
 
 	return Sprite::initWithFile("mazes/" + mazeName + "/sprite.png");
 }
@@ -157,4 +229,18 @@ void Maze::update(float delta)
 {
 	for (int i = 0; i < (int)this->getChildren().size(); ++i)
 		this->getChildren().at(i)->update(delta);
+}
+
+void Maze::pause()
+{
+	pacman->closeMouth();
+	for (int i = 0; i < (int)this->getChildren().size(); ++i)
+		this->getChildren().at(i)->pause();
+	//tiles[29][1]->resume();
+}
+
+void Maze::resume()
+{
+	for (int i = 0; i < (int)this->getChildren().size(); ++i)
+		this->getChildren().at(i)->resume();
 }

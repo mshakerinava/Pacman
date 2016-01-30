@@ -2,6 +2,11 @@
 
 #include "Maze.h"
 
+void Entity::stopMoving()
+{
+	this->speed = 0;
+}
+
 Entity::~Entity()
 {
 }

@@ -41,3 +41,5 @@ pinky  112 140
 inky   96  140
 clyde  128 140
 text   112 164
+life   16  280
+score  52  12

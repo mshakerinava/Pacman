@@ -2,23 +2,23 @@
 
 #include "cocos2d.h"
 
-#include "Pacman.h"
 #include "Direction.h"
+
+class PacmanGame;
 
 USING_NS_CC;
 
-class EventManager
+class EventManager : public Node
 {
 public:
-	static EventManager * getInstance();
-	
-	void addEventListeners(Node *node, Pacman *pacman);
-	
+	static EventManager * create(PacmanGame *game);
+		
 protected:
-	EventManager();
-	virtual ~EventManager();
-	
-	void init();
-
 	static Direction KeyCodeToDirection(EventKeyboard::KeyCode keyCode);
+	
+	bool init(PacmanGame *game);
+	
+	void addEventListeners();
+
+	PacmanGame *game;
 };

@@ -16,22 +16,47 @@ public:
 	void update(float delta);
 
 	void die();
-
+	void fright();
+	
 protected:
+	static const int FRIGHT_TIMES[];
+
 	virtual bool init(Maze *maze);
+
+	int getFrightTime();
 
 	virtual void moveAnimation() = 0;
 	void flashAnimation();
 	void frightAnimation();
 	void eyesAnimation();
+	
+	enum class State
+	{
+		NORMAL,
+		FRIGHTENED,
+		DEAD
+	};
 
-	void fright();
+	void setState(State state);
+	
+	enum class Movement
+	{
+		NORMAL,
+		FRIGHTENED,
+		TUNNEL,
+		ESCAPE,
+		DEAD
+	};
+
+	void setMovement(Movement movement);
 
 	void killPacman();
-	void setDirection(Direction newDirection);
+	void setDirection(Direction direction);
 	float moveTowards(Vec2 dest, float delta);
 
 	virtual Direction ai() = 0;
 
 	bool imprisoned;
+	Movement movement;
+	State state;
 };

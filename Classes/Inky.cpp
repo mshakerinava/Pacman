@@ -21,8 +21,8 @@ Inky * Inky::create(Maze *maze)
 bool Inky::init(Maze *maze)
 {
 	Ghost::init(maze);
-	this->setDirection(Direction::LEFT);
-	this->setPosition(maze->getBlinkyStartPos());
+	this->setDirection(Direction::UP);
+	this->setPosition(maze->getInkyStartPos());
 	return Sprite::initWithFile("images/spritesheet.png", Rect(103, 123, 14, 14));
 }
 

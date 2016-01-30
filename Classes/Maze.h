@@ -20,14 +20,17 @@ public:
 	static Maze * create(std::string mazeName, PacmanGame *game);
 
 	void update(float) override;
+	void pause() override;
+	void resume() override;
 
 	int getWidth();
 	int getHeight();
 
 	GameTile * getTile(Vec2 pos);
 	GameTile * getTile(int row, int col);
-
 	GameTile * getPacmanTile();
+
+	int getLevel();
 
 	Vec2 getPacmanStartPos();
 	Vec2 getBlinkyStartPos();
@@ -35,8 +38,18 @@ public:
 	Vec2 getInkyStartPos();
 	Vec2 getClydeStartPos();
 	Vec2 getTextMidPos();
+	Vec2 getLifeLeftPos();
 
+	void addScore(int score);
+	
+	void stopEntities();
+	void resetEntities();
+	void hideGhosts();
+	void frightenGhosts();
+	void hidePacman();
 	void killPacman();
+	void deathAnimation();
+	void control(Direction dir);
 
 protected:
 	bool init(std::string mazeName, PacmanGame *game);
@@ -58,4 +71,5 @@ protected:
 	Vec2 inkyStartPos;
 	Vec2 clydeStartPos;
 	Vec2 textMidPos;
+	Vec2 lifeLeftPos;
 };

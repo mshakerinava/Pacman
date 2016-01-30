@@ -19,7 +19,7 @@ Pacman * Pacman::create(Maze *maze)
 bool Pacman::init(Maze *maze)
 {
 	Entity::init(maze);
-	this->speed = 0.8f;
+	this->setState(State::NORMAL);
 	this->eatingAnimation();
 	this->intensionDirection = Direction::LEFT;
 	this->applyIntension();
@@ -41,15 +41,6 @@ float Pacman::moveTowards(Vec2 dest, float delta)
 	return MAX(0, delta * (1 - MAX(abs(dest.x - curx), abs(dest.y - cury)) / dpx));
 }
 
-void Pacman::die()
-{
-	this->deathAnimation();
-}
-
-void Pacman::energize()
-{
-}
-
 void Pacman::applyIntension()
 {
 	/* Consume Intension */
@@ -58,14 +49,47 @@ void Pacman::applyIntension()
 	this->setRotation(180.0f - this->movingDirection.getvec2().getAngle() / M_PI * 180);
 }
 
+void Pacman::setState(State state)
+{
+	this->state = state;
+
+	/** The Pacman Dossier @ Gamasutra.com **/
+	if (this->state == State::NORMAL)
+	{
+		if (maze->getLevel() <= 1)
+			this->speed = 0.8f;
+		else if (maze->getLevel() <= 4)
+			this->speed = 0.9f;
+		else if (maze->getLevel() <= 20)
+			this->speed = 1.0f;
+		else
+			this->speed = 0.9f;
+	}
+	else if (this->state == State::ENERGIZED)
+	{
+		if (maze->getLevel() <= 1)
+			this->speed = 0.9f;
+		else if (maze->getLevel() <= 4)
+			this->speed = 0.95f;
+		else
+			this->speed = 1.0f;
+	}
+	else if (this->state == State::DEAD)
+	{
+		this->stopAllActions();
+		this->stopMoving();
+	}
+}
+
 void Pacman::eat(GameTile * tile)
 {
 	if (tile->getToken() == '.')
-		this->score += DOT_SCORE;
+		maze->addScore(DOT_SCORE);
 	else if (tile->getToken() == '@')
 	{
-		this->score += ENERGIZER_SCORE;
-		this->energize();
+		maze->addScore(ENERGIZER_SCORE);
+		this->setState(State::ENERGIZED);
+		maze->frightenGhosts();
 	}
 	tile->eat();
 }
@@ -89,9 +113,10 @@ void Pacman::eatingAnimation()
 
 void Pacman::deathAnimation()
 {
+	this->setRotation(0);
 	/* Create SpriteFrames */
 	Vector<SpriteFrame*> animFrames;
-	animFrames.reserve(4);
+	animFrames.reserve(10);
 	animFrames.pushBack(SpriteFrame::create("images/spritesheet.png", Rect(1  , 241, 17, 17)));
 	animFrames.pushBack(SpriteFrame::create("images/spritesheet.png", Rect(21 , 241, 17, 17)));
 	animFrames.pushBack(SpriteFrame::create("images/spritesheet.png", Rect(41 , 241, 17, 17)));
@@ -103,7 +128,7 @@ void Pacman::deathAnimation()
 	animFrames.pushBack(SpriteFrame::create("images/spritesheet.png", Rect(181, 241, 17, 17)));
 	animFrames.pushBack(SpriteFrame::create("images/spritesheet.png", Rect(201, 241, 17, 17)));
 	/* Create Animation */
-	Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.3f);
+	Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.16f);
 	/* Create Action */
 	Animate* animate = Animate::create(animation);
 	/* Run and repeat Action forever */
@@ -112,6 +137,7 @@ void Pacman::deathAnimation()
 
 void Pacman::closeMouth()
 {
+	this->setDisplayFrame(SpriteFrame::create("images/spritesheet.png", Rect(43, 3, 13, 13)));
 }
 
 void Pacman::update(float delta)
@@ -126,7 +152,7 @@ void Pacman::update(float delta)
 		/* Eating dots slows Pacman down */
 		return;
 	}
-	
+
 	if (intensionDirection != Direction::NONE && nextIntensionTile && nextIntensionTile->isLegalSpace())
 	{
 		this->applyIntension();
@@ -152,5 +178,13 @@ void Pacman::update(float delta)
 
 void Pacman::control(Direction dir)
 {
+	if (this->state == State::DEAD)
+		return;
+	
 	this->intensionDirection = dir;
+}
+
+void Pacman::die()
+{
+	this->setState(State::DEAD);
 }

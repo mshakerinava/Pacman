@@ -10,6 +10,9 @@ USING_NS_CC;
 
 class Entity : public Sprite
 {	
+public:
+	virtual void stopMoving();
+	
 protected:
 	static const int MAX_SPEED = 88/* px/sec */;
 

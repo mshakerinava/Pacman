@@ -18,11 +18,11 @@ bool AppDelegate::applicationDidFinishLaunching()
     if(!glview)
 	{
         glview = GLViewImpl::create("Pacman");
-		glview->setFrameSize(1024, 576);
+		glview->setFrameSize(1920, 1080);
+		//glview->setFrameSize(1024, 576);
 		director->setOpenGLView(glview);
     }
 	
-	// Director::getInstance()->getOpenGLView()->setFrameSize(1920, 1080);
 	// Director::getInstance()->getOpenGLView()->setDesignResolutionSize(1920, 1080, ResolutionPolicy::EXACT_FIT);
 	// Director::getInstance()->setDisplayStats(true);
 

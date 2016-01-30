@@ -19,8 +19,8 @@ Clyde * Clyde::create(Maze *maze)
 bool Clyde::init(Maze *maze)
 {
 	Ghost::init(maze);
-	this->setDirection(Direction::LEFT);
-	this->setPosition(maze->getBlinkyStartPos());
+	this->setDirection(Direction::UP);
+	this->setPosition(maze->getClydeStartPos());
 	return Sprite::initWithFile("images/spritesheet.png", Rect(103, 143, 14, 14));
 }
 

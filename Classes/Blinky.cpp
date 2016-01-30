@@ -19,6 +19,7 @@ Blinky * Blinky::create(Maze *maze)
 bool Blinky::init(Maze *maze)
 {
 	Ghost::init(maze);
+	this->imprisoned = false; /* @override */
 	this->setDirection(Direction::LEFT);
 	this->setPosition(maze->getBlinkyStartPos());
 	return Sprite::initWithFile("images/spritesheet.png", Rect(103, 83, 14, 14));

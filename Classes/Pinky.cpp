@@ -19,8 +19,8 @@ Pinky * Pinky::create(Maze *maze)
 bool Pinky::init(Maze *maze)
 {
 	Ghost::init(maze);
-	this->setDirection(Direction::LEFT);
-	this->setPosition(maze->getBlinkyStartPos());
+	this->setDirection(Direction::DOWN);
+	this->setPosition(maze->getPinkyStartPos());
 	return Sprite::initWithFile("images/spritesheet.png", Rect(103, 143, 14, 14));
 }
 

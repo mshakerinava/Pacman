@@ -15,31 +15,39 @@ class Pacman : public Entity
 {
 public:
 	static Pacman * create(Maze *maze);
-
+	
 	void update(float delta);
 
+	void closeMouth();
 	void control(Direction dir);
 	void die();
-	
+
+	void deathAnimation();
+
 protected:
 	static const int ENERGIZER_SCORE = 50;
 	static const int DOT_SCORE = 10;
 	
 	bool init(Maze *maze);
 
-	void energize();
+	enum class State
+	{
+		NORMAL,
+		ENERGIZED,
+		DEAD
+	};
+
+	State state;
+
+	void setState(State state);
+
 	void eat(GameTile *tile);
 
 	void applyIntension();
 	float moveTowards(Vec2 dest, float delta);
 	
 	void eatingAnimation();
-	void deathAnimation();
-	void closeMouth();
-
+	
 	Direction intensionDirection;
-	
 	float facingAngle;
-	
-	int score = 0;
 };

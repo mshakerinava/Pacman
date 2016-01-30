@@ -1,18 +1,20 @@
 ﻿#include "EventManager.h"
 
-static EventManager *eventManagerInstance = nullptr;
+#include "PacmanGame.h"
 
-EventManager * EventManager::getInstance()
+EventManager * EventManager::create(PacmanGame * game)
 {
-	if (!eventManagerInstance)
+	EventManager *eventManager = new (std::nothrow) EventManager();
+	if (eventManager && eventManager->init(game))
 	{
-		eventManagerInstance = new EventManager();
-		eventManagerInstance->init();
+		eventManager->autorelease();
+		return eventManager;
 	}
-	return eventManagerInstance;
+	CC_SAFE_DELETE(eventManager);
+	return nullptr;
 }
 
-void EventManager::addEventListeners(Node *node, Pacman *pacman)
+void EventManager::addEventListeners()
 {
 	auto listener = EventListenerKeyboard::create();
 
@@ -20,24 +22,23 @@ void EventManager::addEventListeners(Node *node, Pacman *pacman)
 	{
 		log("Key with keycode %d pressed", keyCode);
 		auto dir = KeyCodeToDirection(keyCode);
-		pacman->control(dir);
+		game->control(dir);
 		return true;
 	};
 
-	node->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, node);
+	auto touchListener = EventListenerTouchOneByOne::create();
+
+	//touchListener->on
+
+	game->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, game);
 }
 
-EventManager::EventManager()
+bool EventManager::init(PacmanGame *game)
 {
-}
-
-EventManager::~EventManager()
-{
-	eventManagerInstance = nullptr;
-}
-
-void EventManager::init()
-{
+	this->game = game;
+	game->addChild(this);
+	this->addEventListeners();
+	return true;
 }
 
 Direction EventManager::KeyCodeToDirection(EventKeyboard::KeyCode keyCode)
